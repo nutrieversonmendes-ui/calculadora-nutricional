@@ -191,4 +191,73 @@
         }
         
         /* Estilo para o título de Macros */
-        #macro-titulo-pro
+        #macro-titulo-proporcao {
+            font-size: 1.25em;
+            font-weight: 700;
+            margin-top: 20px;
+            border-bottom: none;
+            color: var(--cor-texto-secundario);
+            text-align: center;
+        }
+
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* Estilo para as caixas de Macros */
+        .macro-item {
+            padding: 15px 10px;
+            border: 2px solid var(--cor-primaria); /* Borda sólida */
+            border-radius: 8px;
+            background-color: var(--cor-fundo-card); /* Fundo branco ou claro */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .macro-item strong {
+            font-size: 1.6em; /* Tamanho maior para o valor em gramas */
+            color: var(--cor-primaria);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .macro-item span {
+            display: block;
+            font-size: 0.85em;
+            color: var(--cor-texto-secundario);
+        }
+
+        .total-macros {
+            text-align: right;
+            margin-top: 15px;
+            font-size: 0.95em;
+            color: var(--cor-texto-secundario);
+        }
+
+        .disclaimer {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        /* Responsividade básica */
+        @media (max-width: 650px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .container {
+                padding: 25px;
+            }
+            .macro-grid {
+                grid-template-columns: 1fr;
+            }
+            .resultado-linha {
+                display: block;
+                text-align: left;
+                padding-bottom: 10
