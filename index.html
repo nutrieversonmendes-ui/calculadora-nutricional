@@ -1,12 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Nutricional Completa - Everson Mendes</title>
+    <style>
+        /* CSS MÍNIMO PARA GARANTIR RENDERIZAÇÃO */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: white; /* Fundo branco para estabilidade */
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .form-group { flex: 1; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px; margin-top: 15px; background-color: green; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .resultado { margin-top: 20px; padding: 10px; border: 1px solid green; }
+        .resultado-linha { display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora Nutricional Completa</h1>
+
+    <div id="unidade-toggle">
+        <label><input type="radio" name="unidade" value="metric" checked onchange="ajustarUnidades()"> Métrico (kg/cm)</label>
+        <label><input type="radio" name="unidade" value="imperial" onchange="ajustarUnidades()"> Imperial (lb/in)</label>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="peso"><span id="label-peso">Peso (kg):</span></label>
+            <input type="number" id="peso" placeholder="Ex: 75" min="1" required>
+        </div>
+        <div class="form-group">
+            <label for="altura"><span id="label-altura">Altura (cm):</span></label>
+            <input type="number" id="altura" placeholder="Ex: 175" min="1" required>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="idade">Idade (anos):</label>
+            <input type="number" id="idade" placeholder="Ex: 30" min="1" required>
+        </div>
+        <div class="form-group">
+            <label for="sexo">Sexo:</label>
+            <select id="sexo" required>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="percentualGordura">Percentual de Gordura Corporal (%GC) (Opcional):</label>
+            <input type="number" id="percentualGordura" placeholder="Ex: 15" min="1" max="60">
+        </div>
+        <div class="form-group">
+            <label for="atividade">Nível de Atividade Física:</label>
+            <select id="atividade" required>
+                <option value="SEDENTARIO">Sedentário</option>
+                <option value="LEVE">Leve (1-3 dias/sem)</option>
+                <option value="MODERADO">Moderado (3-5 dias/sem)</option>
+                <option value="INTENSO">Intenso (6-7 dias/sem)</option>
+                <option value="MUITO_INTENSO">Muito Intenso (2x ao dia)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="objetivo">Objetivo:</label>
+        <select id="objetivo" required>
+            <option value="MANUTENCAO">Manutenção (Não alterar peso)</option>
+            <option value="PERDA_LEVE">Perda de Peso Leve (-300 kcal)</option>
+            <option value="PERDA_MODERADA">Perda de Peso Moderada (-500 kcal)</option>
+            <option value="GANHO_LEVE">Ganho de Massa Leve (+300 kcal)</option>
+            <option value="GANHO_MODERADA">Ganho de Massa Moderado (+500 kcal)</option>
+        </select>
+    </div>
+
+    <button onclick="realizarCalculo()">Calcular Informações Nutricionais</button>
+
+    <div id="resultados" class="resultado" style="display: none;">
+        <h2>Resumo Calórico e Plano</h2>
+        
+        <p class="resultado-linha"><span>TMB <span id="formula-tmb-usada"></span>:</span><strong id="tmb-resultado"></strong> kcal/dia</p>
+        <p class="resultado-linha"><span>Gasto Energético Total (GET):</span><strong id="get-resultado"></strong> kcal/dia</p>
+
+        <p id="linha-calorias-objetivo" class="resultado-linha">
+            <span>Calorias para <span id="objetivo-texto-final"></span>:</span>
+            <strong id="calorias-objetivo"></strong> kcal/dia
+        </p>
+
+        <h2 id="macro-titulo-proporcao">Distribuição de Macronutrientes</h2>
+        
+        <div class="macro-grid">
+            <div class="macro-item"><strong id="prot-gramas"></strong>g <span id="prot-perc-display">Proteínas (0%)</span></div>
+            <div class="macro-item"><strong id="carb-gramas"></strong>g <span id="carb-perc-display">Carboidratos (0%)</span></div>
+            <div class="macro-item"><strong id="gord-gramas"></strong>g <span id="gord-perc-display">Gorduras (0%)</span></div>
+        </div>
+        
+        <p class="total-macros">Total de Calorias dos Macros: <span id="macro-total-kcal"></span> kcal.</p>
+    </div>
+
+</div>
+
 <script>
-    // --- VARIÁVEIS GLOBAIS DE CONVERSÃO E FATOR DE CÁLCULO ---
+    // --- LÓGICA JAVASCRIPT INTACTA ---
     const CONVERSAO_KG_LB = 2.20462;
     const CONVERSAO_IN_CM = 0.393701;
     const FATOR_CAL_PROT = 4;
     const FATOR_CAL_CARB = 4;
     const FATOR_CAL_GORD = 9;
 
-    /** Função para limpar a área de resultados. */
     function resetarResultados() {
         document.getElementById('resultados').style.display = 'none';
         document.getElementById('tmb-resultado').textContent = '...';
@@ -14,7 +131,6 @@
         document.getElementById('calorias-objetivo').textContent = '...';
     }
 
-    /** Calcula a Taxa de Metabolismo Basal (TMB) usando a Equação de Mifflin-St Jeor. */
     function calcularTMBMifflin(peso, altura, idade, sexo) {
         if (sexo.toUpperCase() === 'M') {
             return (10 * peso) + (6.25 * altura) - (5 * idade) + 5;
@@ -23,71 +139,47 @@
         }
     }
 
-    /** Calcula TMB usando a fórmula de Katch-McArdle (requer percentual de gordura). */
     function calcularTMBKatch(peso, percentualGordura) {
         if (percentualGordura <= 0 || percentualGordura >= 60) return 0; 
-        
         const massaMagra = peso * (1 - (percentualGordura / 100));
         return 370 + (21.6 * massaMagra);
     }
 
-    /** Calcula o Gasto Energético Total (GET) multiplicando a TMB pelo Fator de Atividade. */
     function calcularGET(tmb, nivelAtividade) {
         const fatores = {
-            'SEDENTARIO': 1.2,
-            'LEVE': 1.375,
-            'MODERADO': 1.55,
-            'INTENSO': 1.725,
-            'MUITO_INTENSO': 1.9
+            'SEDENTARIO': 1.2, 'LEVE': 1.375, 'MODERADO': 1.55, 'INTENSO': 1.725, 'MUITO_INTENSO': 1.9
         };
         const fatorAtividade = fatores[nivelAtividade.toUpperCase()];
         return tmb * (fatorAtividade || 1.2); 
     }
 
-    /** Calcula as calorias para atingir o objetivo (déficit ou superávit). */
     function calcularCaloriasObjetivo(get, objetivo) {
         const ajustes = {
-            'MANUTENCAO': 0,
-            'PERDA_LEVE': -300,
-            'PERDA_MODERADA': -500,
-            'GANHO_LEVE': 300,
-            'GANHO_MODERADA': 500
+            'MANUTENCAO': 0, 'PERDA_LEVE': -300, 'PERDA_MODERADA': -500, 'GANHO_LEVE': 300, 'GANHO_MODERADA': 500
         };
         const ajuste = ajustes[objetivo.toUpperCase()];
-        // Garante que o ajuste seja aplicado se o valor for válido
         return get + (ajuste !== undefined ? ajuste : 0);
     }
 
-    /** Calcula a distribuição de Macronutrientes com base no objetivo. */
     function calcularMacronutrientes(caloriasObjetivo, objetivo) {
         let protPerc, carbPerc, gordPerc, macroProporcaoTexto;
-        
         switch (objetivo.toUpperCase()) {
             case 'PERDA_LEVE':
             case 'PERDA_MODERADA':
-                protPerc = 0.40; carbPerc = 0.30; gordPerc = 0.30; 
-                macroProporcaoTexto = '40% Prot / 30% Carb / 30% Gord';
-                break;
+                protPerc = 0.40; carbPerc = 0.30; gordPerc = 0.30; macroProporcaoTexto = '40% Prot / 30% Carb / 30% Gord'; break;
             case 'GANHO_LEVE':
             case 'GANHO_MODERADA':
-                protPerc = 0.30; carbPerc = 0.50; gordPerc = 0.20;
-                macroProporcaoTexto = '30% Prot / 50% Carb / 20% Gord';
-                break;
+                protPerc = 0.30; carbPerc = 0.50; gordPerc = 0.20; macroProporcaoTexto = '30% Prot / 50% Carb / 20% Gord'; break;
             case 'MANUTENCAO':
             default:
-                protPerc = 0.30; carbPerc = 0.40; gordPerc = 0.30;
-                macroProporcaoTexto = '30% Prot / 40% Carb / 30% Gord';
-                break;
+                protPerc = 0.30; carbPerc = 0.40; gordPerc = 0.30; macroProporcaoTexto = '30% Prot / 40% Carb / 30% Gord'; break;
         }
-
         const protKcal = caloriasObjetivo * protPerc;
         const carbKcal = caloriasObjetivo * carbPerc;
         const gordKcal = caloriasObjetivo * gordPerc;
-
         const protG = protKcal / FATOR_CAL_PROT;
         const carbG = carbKcal / FATOR_CAL_CARB;
         const gordG = gordKcal / FATOR_CAL_GORD;
-
         const totalKcal = protKcal + carbKcal + gordKcal;
         
         return {
@@ -98,14 +190,12 @@
         };
     }
     
-    /** Ajusta os rótulos de unidade na interface (Métrico/Imperial). */
     function ajustarUnidades() {
         const isMetric = document.querySelector('input[name="unidade"]:checked').value === 'metric';
         document.getElementById('label-peso').textContent = isMetric ? 'Peso (kg):' : 'Peso (lb):';
         document.getElementById('label-altura').textContent = isMetric ? 'Altura (cm):' : 'Altura (in):';
     }
 
-    /** Mapeia o código do objetivo para um texto amigável. */
     function getTextoObjetivo(objetivo) {
         const textos = {
             'MANUTENCAO': 'Manutenção de Peso', 'PERDA_LEVE': 'Perda de Peso Leve', 
@@ -115,46 +205,34 @@
         return textos[objetivo.toUpperCase()] || 'Objetivo Não Definido';
     }
 
-    /** Função principal que coleta dados e exibe o resultado. */
     function realizarCalculo() {
-        // ZERA RESULTADOS NO INÍCIO PARA GARANTIR FEEDBACK
         resetarResultados();
         
-        // Coleta e preparação de dados (USANDO NUMBER() para forçar leitura numérica)
         const isMetric = document.querySelector('input[name="unidade"]:checked').value === 'metric';
-        
         let peso = Number(document.getElementById('peso').value);
         let altura = Number(document.getElementById('altura').value);
         const idade = Number(document.getElementById('idade').value);
-        
         const sexo = document.getElementById('sexo').value;
-        
-        // CORREÇÃO: Lê o valor como string e tenta converter. Se for vazio, é 0.
         const percentualGorduraStr = document.getElementById('percentualGordura').value;
         const percentualGordura = percentualGorduraStr === '' ? 0 : Number(percentualGorduraStr);
-
         const nivelAtividade = document.getElementById('atividade').value;
         const objetivo = document.getElementById('objetivo').value;
 
-        // 1.1 Conversão de Imperial para Métrico se necessário
         if (!isMetric) {
             peso = peso / CONVERSAO_KG_LB; 
             altura = altura * CONVERSAO_IN_CM;
         }
 
-        // 2. Validação dos dados OBRIGATÓRIOS
         if (peso <= 0 || altura <= 0 || idade <= 0 || !Number.isFinite(peso) || !Number.isFinite(altura) || !Number.isFinite(idade) || sexo === '' || nivelAtividade === '' || objetivo === '') {
-             alert('Por favor, preencha todos os campos obrigatórios: Peso, Altura, Idade, Sexo, Nível de Atividade e Objetivo, com valores positivos.');
+             alert('Por favor, preencha todos os campos obrigatórios com valores positivos.');
             return;
         }
 
         try {
             let tmbResultado = 0;
             let formulaUsada = '(Mifflin-St Jeor)';
-            // Garante que se o %GC for 0 (vazio), ele não tente calcular Katch
             const percGorduraValido = percentualGordura > 0 && percentualGordura < 60;
             
-            // 3. Calcular TMB (Prioriza Katch-McArdle)
             if (percGorduraValido) {
                 tmbResultado = calcularTMBKatch(peso, percentualGordura);
                 formulaUsada = '(Katch-McArdle - Baseada na Massa Magra)';
@@ -167,49 +245,32 @@
 
             tmbResultado = Math.round(tmbResultado);
 
-            if (tmbResultado <= 500) { 
-                 throw new Error("O TMB calculado é muito baixo. Verifique os dados inseridos.");
-            }
+            if (tmbResultado <= 500) { throw new Error("O TMB calculado é muito baixo."); }
 
-            // 4. Calcular GET
             const getResultado = Math.round(calcularGET(tmbResultado, nivelAtividade));
-
-            // 5. Calcular Calorias por Objetivo
             const caloriasObjetivo = calcularCaloriasObjetivo(getResultado, objetivo);
-            
-            // 6. Calcular Macros
             const macros = calcularMacronutrientes(caloriasObjetivo, objetivo);
 
-
-            // 7. Exibir resultados
             document.getElementById('formula-tmb-usada').textContent = formulaUsada;
             document.getElementById('tmb-resultado').textContent = tmbResultado.toLocaleString('pt-BR');
             document.getElementById('get-resultado').textContent = getResultado.toLocaleString('pt-BR');
-
-            // CORREÇÃO FINAL: Garante que o nome do objetivo seja exibido e o superávit aplicado
             document.getElementById('objetivo-texto-final').textContent = getTextoObjetivo(objetivo);
-            document.getElementById('calorias-objetivo').textContent = Math.round(caloriasObjetivo).toLocaleString('pt-BR'); // Valor final (GET + Ajuste)
+            document.getElementById('calorias-objetivo').textContent = Math.round(caloriasObjetivo).toLocaleString('pt-BR'); 
 
-            // Exibir Macros Dinâmicos
-            document.getElementById('macro-titulo-proporcao').textContent = `Distribuição de Macronutrientes (${macros.proporcaoTexto})`;
             document.getElementById('prot-gramas').textContent = macros.protG.toLocaleString('pt-BR');
             document.getElementById('carb-gramas').textContent = macros.carbG.toLocaleString('pt-BR');
             document.getElementById('gord-gramas').textContent = macros.gordG.toLocaleString('pt-BR');
-            
             document.getElementById('prot-perc-display').textContent = `Proteínas (${macros.protPerc}%)`;
             document.getElementById('carb-perc-display').textContent = `Carboidratos (${macros.carbPerc}%)`;
             document.getElementById('gord-perc-display').textContent = `Gorduras (${macros.gordPerc}%)`;
-            
             document.getElementById('macro-total-kcal').textContent = `${macros.totalKcal.toLocaleString('pt-BR')} kcal`;
-            
             document.getElementById('resultados').style.display = 'block';
 
         } catch (error) {
-            alert('Falha no cálculo. Verifique os dados inseridos. Detalhe: ' + error.message);
+            alert('Falha no cálculo. Detalhe: ' + error.message);
         }
     }
 
-    // Inicializa a página após o carregamento, garantindo que o DOM esteja pronto
     window.onload = function() {
         ajustarUnidades();
     };
