@@ -168,4 +168,215 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px dashed #e0e0e0; /*
+            border-bottom: 1px dashed #e0e0e0; /* Linha divisória sutil */
+            padding-bottom: 8px;
+        }
+        
+        /* Estilo para a linha final de Calorias (Destacada) */
+        #linha-calorias-objetivo {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #d1ffd6; /* Fundo de destaque mais claro */
+            border-radius: 6px;
+            font-weight: 700;
+            border-bottom: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            font-size: 1.15em;
+        }
+
+        .valor-principal {
+            color: var(--cor-primaria);
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        /* Estilo para o título de Macros */
+        #macro-titulo-proporcao {
+            font-size: 1.25em;
+            font-weight: 700;
+            margin-top: 20px;
+            border-bottom: none;
+            color: var(--cor-texto-secundario);
+            text-align: center;
+        }
+
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* Estilo para as caixas de Macros */
+        .macro-item {
+            padding: 15px 10px;
+            border: 2px solid var(--cor-primaria); /* Borda sólida */
+            border-radius: 8px;
+            background-color: var(--cor-fundo-card); /* Fundo branco ou claro */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .macro-item strong {
+            font-size: 1.6em; /* Tamanho maior para o valor em gramas */
+            color: var(--cor-primaria);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .macro-item span {
+            display: block;
+            font-size: 0.85em;
+            color: var(--cor-texto-secundario);
+        }
+
+        .total-macros {
+            text-align: right;
+            margin-top: 15px;
+            font-size: 0.95em;
+            color: var(--cor-texto-secundario);
+        }
+
+        .disclaimer {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        /* Responsividade básica */
+        @media (max-width: 650px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .container {
+                padding: 25px;
+            }
+            .macro-grid {
+                grid-template-columns: 1fr;
+            }
+            .resultado-linha {
+                display: block;
+                text-align: left;
+                padding-bottom: 10px;
+            }
+            .resultado-linha strong {
+                display: inline-block;
+                margin-left: 10px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-container">
+        <img src="logo.png" alt="Everson Mendes Nutrição e Treinamento">
+    </div>
+
+    <h1>Calculadora Nutricional Completa</h1>
+
+    <div id="unidade-toggle">
+        <label>
+            <input type="radio" name="unidade" value="metric" checked onchange="ajustarUnidades()"> Métrico (kg/cm)
+        </label>
+        <label>
+            <input type="radio" name="unidade" value="imperial" onchange="ajustarUnidades()"> Imperial (lb/in)
+        </label>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="peso"><span id="label-peso">Peso (kg):</span></label>
+            <input type="number" id="peso" placeholder="Ex: 75" min="1" required>
+        </div>
+        <div class="form-group">
+            <label for="altura"><span id="label-altura">Altura (cm):</span></label>
+            <input type="number" id="altura" placeholder="Ex: 175" min="1" required>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="idade">Idade (anos):</label>
+            <input type="number" id="idade" placeholder="Ex: 30" min="1" required>
+        </div>
+        <div class="form-group">
+            <label for="sexo">Sexo:</label>
+            <select id="sexo" required>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="percentualGordura">Percentual de Gordura Corporal (%GC) (Opcional):</label>
+            <input type="number" id="percentualGordura" placeholder="Ex: 15" min="1" max="60">
+        </div>
+        <div class="form-group">
+            <label for="atividade">Nível de Atividade Física:</label>
+            <select id="atividade" required>
+                <option value="SEDENTARIO">Sedentário</option>
+                <option value="LEVE">Leve (1-3 dias/sem)</option>
+                <option value="MODERADO">Moderado (3-5 dias/sem)</option>
+                <option value="INTENSO">Intenso (6-7 dias/sem)</option>
+                <option value="MUITO_INTENSO">Muito Intenso (2x ao dia)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="objetivo">Objetivo:</label>
+        <select id="objetivo" required>
+            <option value="MANUTENCAO">Manutenção (Não alterar peso)</option>
+            <option value="PERDA_LEVE">Perda de Peso Leve (-300 kcal)</option>
+            <option value="PERDA_MODERADA">Perda de Peso Moderada (-500 kcal)</option>
+            <option value="GANHO_LEVE">Ganho de Massa Leve (+300 kcal)</option>
+            <option value="GANHO_MODERADO">Ganho de Massa Moderado (+500 kcal)</option>
+        </select>
+    </div>
+
+    <button onclick="realizarCalculo()">Calcular Informações Nutricionais</button>
+
+    <div id="resultados" class="resultado" style="display: none;">
+        <h2>Resumo Calórico e Plano</h2>
+        
+        <p class="resultado-linha">
+            <span>TMB <span id="formula-tmb-usada"></span>:</span>
+            <span class="valor-principal"><strong id="tmb-resultado"></strong> kcal/dia</span>
+        </p>
+
+        <p class="resultado-linha">
+            <span>Gasto Energético Total (GET):</span>
+            <span class="valor-principal"><strong id="get-resultado"></strong> kcal/dia</span>
+        </p>
+
+        <p id="linha-calorias-objetivo" class="resultado-linha">
+            <span>Calorias para <span id="objetivo-texto-final"></span>:</span>
+            <span class="valor-principal"><strong id="calorias-objetivo"></strong> kcal/dia</span>
+        </p>
+
+        <h2 id="macro-titulo-proporcao">Distribuição de Macronutrientes</h2>
+        
+        <div class="macro-grid">
+            <div class="macro-item">
+                <strong id="prot-gramas"></strong>g
+                <span id="prot-perc-display">Proteínas (0%)</span>
+            </div>
+            <div class="macro-item">
+                <strong id="carb-gramas"></strong>g
+                <span id="carb-perc-display">Carboidratos (0%)</span>
+            </div>
+            <div class="macro-item">
+                <strong id="gord-gramas"></strong>g
+                <span id="gord-perc-display">Gorduras (0%)</span>
+            </div>
+        </div>
+        
+        <p class="total-macros">
+             Total de Calor
