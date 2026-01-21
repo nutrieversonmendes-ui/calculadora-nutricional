@@ -5,47 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Nutricional Pro - Everson Mendes</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 450px; width: 100%; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; /* Permite que a caixa comece do topo */
+            padding: 20px; 
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+            max-width: 450px; 
+            width: 100%; 
+            margin-top: 20px;
+            margin-bottom: 40px; /* Espaço extra no final para não cortar */
+        }
         h2 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; color: #34495e; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 15px; transition: 0.3s; }
-        button:hover { background-color: #219150; }
-        .result { margin-top: 25px; padding: 15px; background-color: #e8f6ef; border-radius: 8px; display: none; }
-        .result h3 { margin-top: 0; color: #27ae60; }
-        .formula-info { font-size: 0.85em; color: #7f8c8d; margin-top: 10px; font-style: italic; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Calculadora Nutricional</h2>
-    
-    <div class="input-group">
-        <label>Metodologia de Cálculo</label>
-        <select id="formula">
-            <option value="mifflin">Mifflin-St Jeor (Geral)</option>
-            <option value="harris">Harris-Benedict (Clínica)</option>
-            <option value="katch">Katch-McArdle (Recomendado c/ %GC)</option>
-            <option value="cunningham">Cunningham (Atletas)</option>
-        </select>
-    </div>
-
-    <div class="input-group">
-        <label>Sexo</label>
-        <select id="sexo">
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-        </select>
-    </div>
-
-    <div class="input-group">
-        <label>Peso (kg)</label>
-        <input type="number" id="peso" placeholder="Ex: 80">
-    </div>
-
-    <div class="input-group">
-        <label>Altura (cm)</label>
-        <input type="number" id="altura" placeholder="
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 16px;
+        }
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background-color: #27ae60; 
+            color: white; 
+            border
